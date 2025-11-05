@@ -3,54 +3,110 @@
     --fiwa-dark-blue: #1B365D;
     --fiwa-light-blue: #3A7ECB;
     --fiwa-gold: #D4AF37;
-    --fiwa-bg-light: #f0f2f5; /* Light grey/blue background */
+    --fiwa-bg-light: #f0f2f5; 
 }
 
 body {
     font-family: Arial, sans-serif;
-    background-color: var(--fiwa-bg-light); /* Use new background color */
+    background-color: var(--fiwa-bg-light); 
     margin: 0;
 }
 
-header {
-    background-color: var(--fiwa-dark-blue); /* Use dark blue */
+/* --- NEW LAYOUT STYLES --- */
+#page-container {
+    transition: all 0.3s ease-in-out;
+}
+
+/* 1. THIS IS THE DEFAULT STATE (CENTERED) */
+.centered-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* Center on the viewport */
+    flex-direction: column;
+}
+
+.centered-layout header {
+    background-color: transparent; /* No background */
+    padding: 20px;
+    border-bottom: none; /* No border */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.centered-layout main {
+    display: none; /* Hide results and 'load more' on homepage */
+}
+
+/* 2. THIS IS THE "AFTER SEARCH" STATE */
+.results-layout {
+    display: block; /* Normal page flow */
+}
+
+.results-layout header {
+    background-color: var(--fiwa-dark-blue); /* Add background back */
     padding: 20px;
     border-bottom: 1px solid #ddd;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px; /* Adds space between the items */
+    gap: 15px; 
 }
+
+.results-layout main {
+    display: block; /* Show results */
+}
+/* --- END OF NEW LAYOUT STYLES --- */
 
 header h1 {
     margin: 0;
-    color: white; /* Changed from red */
+    color: var(--fiwa-dark-blue); /* Use blue by default */
+}
+
+.results-layout header h1 {
+    color: white; /* White text on dark header */
 }
 
 .search-container {
-    width: 50%;
+    width: 100%;
+    max-width: 600px; /* Limit search bar width */
     display: flex;
 }
 
 #search-input {
     width: 100%;
-    padding: 8px;
+    padding: 10px 15px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 4px 0 0 4px;
+    border-radius: 20px 0 0 20px; /* Rounded */
 }
 
 #search-button {
-    padding: 8px 12px;
+    padding: 10px 15px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-left: none;
     background-color: #f8f8f8;
     cursor: pointer;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 20px 20px 0; /* Rounded */
 }
 #search-button:hover {
     background-color: #eee;
+}
+
+.disclaimer {
+    margin: 0;
+    padding: 0 10%;
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+    text-align: center;
+}
+
+.results-layout .disclaimer {
+    color: #ccc; /* Lighter text on dark header */
 }
 
 #results-container {
@@ -58,7 +114,6 @@ header h1 {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px;
-    min-height: 200px; /* So we can see the error message */
 }
 
 .video-item {
@@ -68,97 +123,42 @@ header h1 {
     overflow: hidden;
     cursor: pointer;
 }
-
-.video-item img {
-    width: 100%;
-    height: auto;
-}
-
-.video-item h4 {
-    padding: 10px;
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-}
+.video-item img { width: 100%; height: auto; }
+.video-item h4 { padding: 10px; margin: 0; font-size: 16px; color: #333; }
 
 #load-more-button {
-    display: none;
+    display: none; /* Hidden by default */
     margin: 20px auto;
     padding: 12px 24px;
     font-size: 16px;
     font-weight: bold;
     color: white;
-    background-color: var(--fiwa-light-blue); /* Use light blue */
+    background-color: var(--fiwa-light-blue);
     border: none;
     border-radius: 8px;
     cursor: pointer;
 }
+#load-more-button:hover { background-color: var(--fiwa-gold); }
 
-#load-more-button:hover {
-    background-color: var(--fiwa-gold); /* Use gold on hover */
-}
-
-.disclaimer {
-    margin: 0;
-    padding: 0 10%;
-    font-size: 12px;
-    color: #ccc; /* Light grey text on dark blue */
-    font-style: italic;
-    text-align: center;
-}
-
-/* --- STYLES FOR THE MODAL POP-UP --- */
+/* --- MODAL STYLES (No changes) --- */
 #modal-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
-    z-index: 1000;
-    
-    /* This hides it by default */
-    display: none; 
-    justify-content: center;
-    align-items: center;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); z-index: 1000;
+    display: none; justify-content: center; align-items: center;
 }
-
 #modal-content {
-    background-color: #000;
-    padding: 20px;
-    border-radius: 8px;
-    position: relative;
-    width: 80%;
-    max-width: 900px;
+    background-color: #000; padding: 20px; border-radius: 8px;
+    position: relative; width: 80%; max-width: 900px;
 }
-
 #modal-close-button {
-    position: absolute;
-    top: -15px;
-    right: -15px;
-    background-color: white;
-    color: black;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 1001;
+    position: absolute; top: -15px; right: -15px; background-color: white;
+    color: black; border: none; border-radius: 50%;
+    width: 30px; height: 30px; font-size: 20px;
+    font-weight: bold; cursor: pointer; z-index: 1001;
 }
-
 #video-player-container {
-    position: relative;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
-    height: 0;
-    overflow: hidden;
+    position: relative; padding-top: 56.25%; height: 0; overflow: hidden;
 }
-
 #video-player-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 }
