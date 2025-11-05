@@ -7,23 +7,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
+    <div id="page-container" class="centered-layout">
 
-    <header>
-        <h1>YuLife Video</h1> 
-        <p class="disclaimer">
-            This site (yulife.netlify.app) is an independent project and is not affiliated with, sponsored, or endorsed by YouTube or Google LLC. It uses the YouTube API Services. All video content and trademarks are the property of YouTube, Google LLC, and their respective owners.
-        </p>
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search...">
-            <button id="search-button">Search</button>
-        </div>
-    </header>
-
-    <main>
-        <div id="results-container">
+        <header>
+            <h1>YuLife Video</h1> 
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search...">
+                <button id="search-button">Search</button>
             </div>
-        <button id="load-more-button">Load More</button>
-    </main>
+            <p class="disclaimer">
+                This site (yulife.netlify.app) is an independent project and is not affiliated with, sponsored, or endorsed by YouTube or Google LLC. It uses the YouTube API Services. All video content and trademarks are the property of YouTube, Google LLC, and their respective owners.
+            </p>
+        </header>
+
+        <main>
+            <div id="results-container">
+                </div>
+            <button id="load-more-button">Load More</button>
+        </main>
+
+    </div>
 
     <div id="modal-container">
         <div id="modal-content">
