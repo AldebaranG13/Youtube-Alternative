@@ -5,6 +5,11 @@ const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
 const searchButton = document.getElementById('search-button');
 const searchInput = document.getElementById('search-input');
 const resultsContainer = document.getElementById('results-container');
+const loadMoreButton = document.getElementById('load-more-button');
+
+// A variable to hold our "magic ticket"
+let nextPageToken = '';
+let currentChannelId = 'UCaO-aO_m-iN8G0_7-yE-1fQ'; // FIWA Official ID
 
 // Event listener for "Press Enter to Search"
 searchInput.addEventListener('keydown', (event) => {
@@ -17,8 +22,15 @@ searchInput.addEventListener('keydown', (event) => {
 searchButton.addEventListener('click', () => {
     const query = searchInput.value;
     if (query) {
+        nextPageToken = ''; 
+        loadMoreButton.style.display = 'none';
         searchVideos(query);
     }
+});
+
+// Add event listener for the load more button
+loadMoreButton.addEventListener('click', () => {
+    loadChannelVideos();
 });
 
 // This function calls the YouTube API for SEARCH
@@ -30,60 +42,87 @@ async function searchVideos(query) {
         const data = await response.json();
         
         resultsContainer.innerHTML = ''; // Clear old results
-        displayVideos(data.items);
+
+        // --- NEW SAFETY CHECK ---
+        if (data.items) {
+            displayVideos(data.items);
+        } else if (data.error) {
+            // Throw the error message from Google
+            throw new Error(data.error.message);
+        } else {
+            throw new Error("API returned no videos for this search.");
+        }
+        // --- END OF SAFETY CHECK ---
+
     } 
     catch (error) {
-        // This will print the error on your webpage
-        resultsContainer.innerHTML = `
-            <p><strong>Error:</strong></p>
-            <pre>${error.toString()}</pre>
-            <p><strong>(This is probably a 'RefererNotAllowedMapError'. Check your Google Console restrictions.)</strong></p>
-        `;
+        resultsContainer.innerHTML = `<p><strong>Error:</strong> <pre>${error.toString()}</pre></p>`;
     }
 }
 
-// --- This is the function to get "Popular EDUCATIONAL" videos ---
-async function loadPopularVideos() {
-    // We use the /videos endpoint and filter the "mostPopular" chart by category ID 27.
-    // We must include a regionCode for this to work.
-    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=27&regionCode=US&key=${API_KEY}&maxResults=12`;
+// This function loads the FIWA channel videos
+async function loadChannelVideos() {
+    let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${currentChannelId}&order=date&type=video&key=${API_KEY}&maxResults=50`;
+
+    if (nextPageToken) {
+        url += `&pageToken=${nextPageToken}`;
+    }
 
     try {
         const response = await fetch(url);
         const data = await response.json();
 
-        resultsContainer.innerHTML = ''; // Clear loading text
-        displayVideos(data.items);
+        // --- NEW SAFETY CHECK ---
+        if (data.items) {
+            nextPageToken = data.nextPageToken; // Save the token
+
+            if (!url.includes(`&pageToken=`)) {
+                 resultsContainer.innerHTML = ''; // Clear only on first load
+            }
+            
+            displayVideos(data.items); // Call the function
+
+            if (nextPageToken) {
+                loadMoreButton.style.display = 'block';
+            } else {
+                loadMoreButton.style.display = 'none';
+            }
+        } else if (data.error) {
+            // Throw the error message from Google
+            throw new Error(data.error.message);
+        } else {
+            // This happens if the channel has no videos or there's an issue
+            if (resultsContainer.innerHTML === '') {
+                 resultsContainer.innerHTML = '<p>Could not load channel videos.</p>';
+            }
+        }
+        // --- END OF SAFETY CHECK ---
+
     } catch (error) {
-        // This will print the error on your webpage
-        resultsContainer.innerHTML = `
-            <p><strong>Error loading popular videos:</strong></p>
-            <pre>${error.toString()}</pre>
-        `;
+        resultsContainer.innerHTML = `<p><strong>Error loading channel videos:</strong> <pre>${error.toString()}</pre></p>`;
     }
 }
-// --- END OF FUNCTION ---
 
 // This function takes the video data and builds the HTML
 function displayVideos(videos) {
-    if (videos.length === 0) {
-        resultsContainer.innerHTML = '<p>No videos found.</p>';
+    // --- NEW BULLETPROOF CHECK ---
+    // If 'videos' is undefined, null, or has no length, stop.
+    if (!videos || videos.length === 0) {
+        if (resultsContainer.innerHTML === '') {
+             resultsContainer.innerHTML = '<p>No videos found.</p>';
+        }
         return;
     }
+    // --- END OF CHECK ---
 
     videos.forEach(video => {
-        // --- IMPORTANT: This handles both Search results and Popular results ---
-        const videoId = video.id.videoId ? video.id.videoId : video.id;
-        // --- END OF IMPORTANT LINE ---
-
+        const videoId = video.id.videoId;
         const videoTitle = video.snippet.title;
         const videoThumbnail = video.snippet.thumbnails.high.url;
 
-        // Create a new div for each video
         const videoElement = document.createElement('div');
         videoElement.className = 'video-item';
 
-        // When a video is clicked, it will open in a new tab
         videoElement.innerHTML = `
             <img src="${videoThumbnail}" alt="${videoTitle}">
             <h4>${videoTitle}</h4>
@@ -93,10 +132,9 @@ function displayVideos(videos) {
             window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
         });
 
-        // Add the new video element to our results container
         resultsContainer.appendChild(videoElement);
     });
 }
 
-// Call the function to load popular videos when the script first runs
-loadPopularVideos();
+// Call the function to load the *first page* of channel videos when the script first runs
+loadChannelVideos();
