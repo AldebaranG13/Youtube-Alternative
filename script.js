@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- PASTE YOUR (FULL!) API KEY HERE ---
-    const API_KEY = 'YOUR_API_KEY_HERE';
+    const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
 
     // Get the HTML elements we need to work with
     const pageContainer = document.getElementById('page-container');
