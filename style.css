@@ -1,11 +1,19 @@
+/* --- NEW FIWA-INSPIRED COLOR PALETTE --- */
+:root {
+    --fiwa-dark-blue: #1B365D;
+    --fiwa-light-blue: #3A7ECB;
+    --fiwa-gold: #D4AF37;
+    --fiwa-bg-light: #f0f2f5; /* Light grey/blue background */
+}
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    background-color: var(--fiwa-bg-light); /* Use new background color */
     margin: 0;
 }
 
 header {
-    background-color: #ffffff;
+    background-color: var(--fiwa-dark-blue); /* Use dark blue */
     padding: 20px;
     border-bottom: 1px solid #ddd;
     display: flex;
@@ -16,7 +24,7 @@ header {
 
 header h1 {
     margin: 0;
-    color: red;
+    color: white; /* Changed from red */
 }
 
 .search-container {
@@ -40,6 +48,9 @@ header h1 {
     background-color: #f8f8f8;
     cursor: pointer;
     border-radius: 0 4px 4px 0;
+}
+#search-button:hover {
+    background-color: #eee;
 }
 
 #results-container {
@@ -76,21 +87,21 @@ header h1 {
     font-size: 16px;
     font-weight: bold;
     color: white;
-    background-color: #ff0000;
+    background-color: var(--fiwa-light-blue); /* Use light blue */
     border: none;
     border-radius: 8px;
     cursor: pointer;
 }
 
 #load-more-button:hover {
-    background-color: #cc0000;
+    background-color: var(--fiwa-gold); /* Use gold on hover */
 }
 
 .disclaimer {
     margin: 0;
     padding: 0 10%;
     font-size: 12px;
-    color: #888;
+    color: #ccc; /* Light grey text on dark blue */
     font-style: italic;
     text-align: center;
 }
@@ -100,6 +111,7 @@ header h1 {
     display: none;
 }
 
+/* --- THIS IS THE BUG FIX --- */
 #modal-container {
     position: fixed;
     top: 0;
@@ -108,10 +120,13 @@ header h1 {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.85);
     z-index: 1000;
-    display: flex;
+    
+    /* This is what opens/closes it now */
+    display: none; /* <-- IT IS NOW HIDDEN BY DEFAULT */
     justify-content: center;
     align-items: center;
 }
+/* --- END OF BUG FIX --- */
 
 #modal-content {
     background-color: #000;
