@@ -7,6 +7,11 @@ const searchInput = document.getElementById('search-input');
 const resultsContainer = document.getElementById('results-container');
 const loadMoreButton = document.getElementById('load-more-button');
 
+// --- Get the modal elements ---
+const modalContainer = document.getElementById('modal-container');
+const modalCloseButton = document.getElementById('modal-close-button');
+const videoPlayerContainer = document.getElementById('video-player-container');
+
 // A variable to hold our "magic ticket"
 let nextPageToken = '';
 let currentChannelId = 'UCaO-aO_m-iN8G0_7-yE-1fQ'; // FIWA Official ID
@@ -33,21 +38,48 @@ loadMoreButton.addEventListener('click', () => {
     loadChannelVideos();
 });
 
+// --- Event listeners for closing the modal ---
+modalCloseButton.addEventListener('click', () => {
+    closeModal();
+});
+modalContainer.addEventListener('click', (event) => {
+    if (event.target === modalContainer) {
+        closeModal();
+    }
+});
+
+// --- Function to open the modal ---
+function openModal(videoId) {
+    videoPlayerContainer.innerHTML = `
+        <iframe 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    `;
+    modalContainer.classList.remove('hidden');
+}
+
+// --- Function to close the modal ---
+function closeModal() {
+    videoPlayerContainer.innerHTML = '';
+    modalContainer.classList.add('hidden');
+}
+
 // This function calls the YouTube API for SEARCH
 async function searchVideos(query) {
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${API_KEY}&type=video&maxResults=12`;
-
     try {
         const response = await fetch(url);
         const data = await response.json();
-        
-        resultsContainer.innerHTML = ''; // Clear old results
+        resultsContainer.innerHTML = ''; 
 
         // --- NEW SAFETY CHECK ---
         if (data.items) {
             displayVideos(data.items);
         } else if (data.error) {
-            // Throw the error message from Google
             throw new Error(data.error.message);
         } else {
             throw new Error("API returned no videos for this search.");
@@ -63,7 +95,6 @@ async function searchVideos(query) {
 // This function loads the FIWA channel videos
 async function loadChannelVideos() {
     let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${currentChannelId}&order=date&type=video&key=${API_KEY}&maxResults=50`;
-
     if (nextPageToken) {
         url += `&pageToken=${nextPageToken}`;
     }
@@ -74,24 +105,19 @@ async function loadChannelVideos() {
 
         // --- NEW SAFETY CHECK ---
         if (data.items) {
-            nextPageToken = data.nextPageToken; // Save the token
-
+            nextPageToken = data.nextPageToken; 
             if (!url.includes(`&pageToken=`)) {
-                 resultsContainer.innerHTML = ''; // Clear only on first load
+                 resultsContainer.innerHTML = ''; 
             }
-            
-            displayVideos(data.items); // Call the function
-
+            displayVideos(data.items); 
             if (nextPageToken) {
                 loadMoreButton.style.display = 'block';
             } else {
                 loadMoreButton.style.display = 'none';
             }
         } else if (data.error) {
-            // Throw the error message from Google
             throw new Error(data.error.message);
         } else {
-            // This happens if the channel has no videos or there's an issue
             if (resultsContainer.innerHTML === '') {
                  resultsContainer.innerHTML = '<p>Could not load channel videos.</p>';
             }
@@ -105,15 +131,14 @@ async function loadChannelVideos() {
 
 // This function takes the video data and builds the HTML
 function displayVideos(videos) {
-    // --- NEW BULLETPROOF CHECK ---
-    // If 'videos' is undefined, null, or has no length, stop.
+    // --- THIS IS THE FIX FOR YOUR 'TypeError' CRASH ---
     if (!videos || videos.length === 0) {
         if (resultsContainer.innerHTML === '') {
              resultsContainer.innerHTML = '<p>No videos found.</p>';
         }
         return;
     }
-    // --- END OF CHECK ---
+    // --- END OF FIX ---
 
     videos.forEach(video => {
         const videoId = video.id.videoId;
@@ -129,7 +154,7 @@ function displayVideos(videos) {
         `;
         
         videoElement.addEventListener('click', () => {
-            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+            openModal(videoId);
         });
 
         resultsContainer.appendChild(videoElement);
