@@ -1,5 +1,5 @@
 // --- PASTE YOUR (FULL!) API KEY HERE ---
-const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
+const API_KEY = 'YOUR_API_KEY_HERE';
 
 // Get the HTML elements we need to work with
 const searchButton = document.getElementById('search-button');
@@ -59,19 +59,18 @@ function openModal(videoId) {
             allowfullscreen>
         </iframe>
     `;
-    // --- THIS IS THE JAVASCRIPT FIX ---
-    modalContainer.style.display = 'flex'; // <-- Changed from classList
+    modalContainer.style.display = 'flex'; // <-- This shows the pop-up
 }
 
 // --- Function to close the modal ---
 function closeModal() {
     videoPlayerContainer.innerHTML = '';
-    // --- THIS IS THE JAVASCRIPT FIX ---
-    modalContainer.style.display = 'none'; // <-- Changed from classList
+    modalContainer.style.display = 'none'; // <-- This hides the pop-up
 }
 
 // This function calls the YouTube API for SEARCH
 async function searchVideos(query) {
+    // This function will get 12 results (which is good for a search)
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${API_KEY}&type=video&maxResults=12`;
     try {
         const response = await fetch(url);
@@ -94,6 +93,7 @@ async function searchVideos(query) {
 
 // This function loads the FIWA channel videos
 async function loadChannelVideos() {
+    // THIS IS THE FIX: It loads 50 videos, not 12.
     let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${currentChannelId}&order=date&type=video&key=${API_KEY}&maxResults=50`;
     if (nextPageToken) {
         url += `&pageToken=${nextPageToken}`;
@@ -109,6 +109,8 @@ async function loadChannelVideos() {
                  resultsContainer.innerHTML = ''; 
             }
             displayVideos(data.items); 
+            
+            // THIS IS THE FIX: It shows the button.
             if (nextPageToken) {
                 loadMoreButton.style.display = 'block';
             } else {
@@ -126,35 +128,4 @@ async function loadChannelVideos() {
     }
 }
 
-// This function takes the video data and builds the HTML
-function displayVideos(videos) {
-    if (!videos || videos.length === 0) {
-        if (resultsContainer.innerHTML === '') {
-             resultsContainer.innerHTML = '<p>No videos found.</p>';
-        }
-        return;
-    }
-
-    videos.forEach(video => {
-        const videoId = video.id.videoId;
-        const videoTitle = video.snippet.title;
-        const videoThumbnail = video.snippet.thumbnails.high.url;
-
-        const videoElement = document.createElement('div');
-        videoElement.className = 'video-item';
-
-        videoElement.innerHTML = `
-            <img src="${videoThumbnail}" alt="${videoTitle}">
-            <h4>${videoTitle}</h4>
-        `;
-        
-        videoElement.addEventListener('click', () => {
-            openModal(videoId);
-S        });
-
-        resultsContainer.appendChild(videoElement);
-    });
-}
-
-// Call the function to load the *first page* of channel videos when the script first runs
-loadChannelVideos();
+// This function takes
