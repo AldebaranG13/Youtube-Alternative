@@ -1,4 +1,4 @@
-/* --- NEW FIWA-INSPIRED COLOR PALETTE --- */
+/* --- FIWA-INSPIRED COLOR PALETTE --- */
 :root {
     --fiwa-dark-blue: #1B365D;
     --fiwa-light-blue: #3A7ECB;
@@ -19,7 +19,7 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 15px; /* Adds space between the items */
 }
 
 header h1 {
@@ -58,6 +58,7 @@ header h1 {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px;
+    min-height: 200px; /* So we can see the error message */
 }
 
 .video-item {
@@ -107,11 +108,6 @@ header h1 {
 }
 
 /* --- STYLES FOR THE MODAL POP-UP --- */
-.hidden {
-    display: none;
-}
-
-/* --- THIS IS THE BUG FIX --- */
 #modal-container {
     position: fixed;
     top: 0;
@@ -121,12 +117,11 @@ header h1 {
     background-color: rgba(0, 0, 0, 0.85);
     z-index: 1000;
     
-    /* This is what opens/closes it now */
-    display: none; /* <-- IT IS NOW HIDDEN BY DEFAULT */
+    /* This hides it by default */
+    display: none; 
     justify-content: center;
     align-items: center;
 }
-/* --- END OF BUG FIX --- */
 
 #modal-content {
     background-color: #000;
