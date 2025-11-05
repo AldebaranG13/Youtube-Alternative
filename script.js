@@ -1,5 +1,5 @@
 // --- PASTE YOUR (FULL!) API KEY HERE ---
-const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
+const API_KEY = 'YOUR_API_KEY_HERE';
 
 // Get the HTML elements we need to work with
 const searchButton = document.getElementById('search-button');
@@ -59,13 +59,15 @@ function openModal(videoId) {
             allowfullscreen>
         </iframe>
     `;
-    modalContainer.classList.remove('hidden');
+    // --- THIS IS THE JAVASCRIPT FIX ---
+    modalContainer.style.display = 'flex'; // <-- Changed from classList
 }
 
 // --- Function to close the modal ---
 function closeModal() {
     videoPlayerContainer.innerHTML = '';
-    modalContainer.classList.add('hidden');
+    // --- THIS IS THE JAVASCRIPT FIX ---
+    modalContainer.style.display = 'none'; // <-- Changed from classList
 }
 
 // This function calls the YouTube API for SEARCH
@@ -76,7 +78,6 @@ async function searchVideos(query) {
         const data = await response.json();
         resultsContainer.innerHTML = ''; 
 
-        // --- NEW SAFETY CHECK ---
         if (data.items) {
             displayVideos(data.items);
         } else if (data.error) {
@@ -84,7 +85,6 @@ async function searchVideos(query) {
         } else {
             throw new Error("API returned no videos for this search.");
         }
-        // --- END OF SAFETY CHECK ---
 
     } 
     catch (error) {
@@ -103,7 +103,6 @@ async function loadChannelVideos() {
         const response = await fetch(url);
         const data = await response.json();
 
-        // --- NEW SAFETY CHECK ---
         if (data.items) {
             nextPageToken = data.nextPageToken; 
             if (!url.includes(`&pageToken=`)) {
@@ -122,8 +121,6 @@ async function loadChannelVideos() {
                  resultsContainer.innerHTML = '<p>Could not load channel videos.</p>';
             }
         }
-        // --- END OF SAFETY CHECK ---
-
     } catch (error) {
         resultsContainer.innerHTML = `<p><strong>Error loading channel videos:</strong> <pre>${error.toString()}</pre></p>`;
     }
@@ -131,14 +128,12 @@ async function loadChannelVideos() {
 
 // This function takes the video data and builds the HTML
 function displayVideos(videos) {
-    // --- THIS IS THE FIX FOR YOUR 'TypeError' CRASH ---
     if (!videos || videos.length === 0) {
         if (resultsContainer.innerHTML === '') {
              resultsContainer.innerHTML = '<p>No videos found.</p>';
         }
         return;
     }
-    // --- END OF FIX ---
 
     videos.forEach(video => {
         const videoId = video.id.videoId;
@@ -155,7 +150,7 @@ function displayVideos(videos) {
         
         videoElement.addEventListener('click', () => {
             openModal(videoId);
-        });
+S        });
 
         resultsContainer.appendChild(videoElement);
     });
