@@ -12,36 +12,12 @@ body {
     margin: 0;
 }
 
-/* --- LAYOUT STYLES --- */
 #page-container {
     transition: all 0.3s ease-in-out;
 }
 
-/* 1. DEFAULT STATE (CENTERED) */
-.centered-layout {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    flex-direction: column;
-    background-image: linear-gradient(rgba(27, 54, 93, 0.7), rgba(27, 54, 93, 0.7)), url('https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop');
-    background-size: cover;
-    background-position: center;
-}
-.centered-layout header {
-    background-color: transparent; 
-    padding: 20px;
-    border-bottom: none; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
-.centered-layout main { display: none; }
-
-/* 2. "AFTER SEARCH" STATE */
-.results-layout { display: block; }
-.results-layout header {
+/* --- HEADER & SEARCH STYLES (NOW DEFAULT) --- */
+header {
     background-color: var(--fiwa-dark-blue); 
     padding: 20px;
     border-bottom: 1px solid #ddd;
@@ -50,12 +26,11 @@ body {
     align-items: center;
     gap: 15px; 
 }
-.results-layout main { display: block; }
 
-/* --- HEADER & SEARCH STYLES --- */
-header h1 { margin: 0; }
-.centered-layout header h1 { color: white; }
-.results-layout header h1 { color: white; }
+header h1 {
+    margin: 0;
+    color: white;
+}
 
 .search-container {
     width: 100%;
@@ -86,9 +61,8 @@ header h1 { margin: 0; }
     font-size: 12px;
     font-style: italic;
     text-align: center;
+    color: #ccc; /* Defaulted to the 'results' color */
 }
-.centered-layout .disclaimer { color: #ddd; }
-.results-layout .disclaimer { color: #ccc; }
 
 /* --- RESULTS GRID STYLES --- */
 #results-container {
@@ -111,7 +85,6 @@ header h1 { margin: 0; }
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* --- NEW ANIMATION: Hover effect --- */
 .video-item:hover {
     transform: scale(1.03);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
