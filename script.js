@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
 
     // Get the HTML elements
-    const pageContainer = document.getElementById('page-container');
+    // const pageContainer = document.getElementById('page-container'); // DELETED
     const searchButton = document.getElementById('search-button');
     const searchInput = document.getElementById('search-input');
     const resultsContainer = document.getElementById('results-container');
@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalContainer = document.getElementById('modal-container');
     const modalCloseButton = document.getElementById('modal-close-button');
     const videoPlayerContainer = document.getElementById('video-player-container');
-    // --- NEW: Get the analytics box ---
     const analyticsContainer = document.getElementById('video-analytics-container');
 
     // --- Variables for search pagination ---
@@ -51,12 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="channel-name">${channelName}</p> 
             `;
             
-            // --- UPDATED CLICK LISTENER ---
             videoElement.addEventListener('click', () => {
-                // NEW: We first get the stats, THEN open the modal.
                 getVideoDetailsAndOpenModal(videoId);
             });
-            // --- END OF UPDATE ---
 
             resultsContainer.appendChild(videoElement);
         });
@@ -74,14 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (data.items && data.items.length > 0) {
                 const videoDetails = data.items[0];
-                // Now we have the stats, we can open the modal
                 openModal(videoId, videoDetails);
             } else {
                 throw new Error('Video details not found.');
             }
         } catch (error) {
-            // If the call fails, just open the video player
-            // without the stats box.
             openModal(videoId, null); 
             console.error('Error loading video details:', error.message);
         }
@@ -107,13 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const stats = videoDetails.statistics;
             const snippet = videoDetails.snippet;
 
-            // Format numbers with commas (e.g., 1,234,567)
-            // Use '?? 0' to prevent errors if a stat is missing
             const viewCount = parseInt(stats.viewCount ?? 0).toLocaleString();
             const likeCount = parseInt(stats.likeCount ?? 0).toLocaleString();
             const commentCount = parseInt(stats.commentCount ?? 0).toLocaleString();
 
-            // Format the date
             const uploadDate = new Date(snippet.publishedAt).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
@@ -154,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
     function closeModal() {
         videoPlayerContainer.innerHTML = '';
-        // NEW: Clear the analytics box and hide it
         analyticsContainer.innerHTML = '';
         analyticsContainer.classList.remove('visible');
         
@@ -181,8 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadMoreButton.style.display = 'none'; 
             resultsContainer.innerHTML = ''; 
             
-            pageContainer.classList.add('results-layout');
-            pageContainer.classList.remove('centered-layout');
+            // --- LAYOUT SWITCHING CODE DELETED ---
 
             searchVideos(currentSearchQuery);
         }
@@ -207,6 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Search function ---
     async function searchVideos(query) {
+        // --- THIS NEW LINE SETS THE QUERY FOR "LOAD MORE" ---
+        currentSearchQuery = query;
+
         let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${API_KEY}&type=video&maxResults=50`;
         
         if (nextPageToken) {
@@ -237,5 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
             resultsContainer.innerHTML = `<p><strong>Error:</strong> <pre>${error.toString()}</pre></p>`;
         }
     }
+
+    // ---
+    // NEW: LOAD DEFAULT VIDEOS ON STARTUP
+    // ---
+    searchVideos('popular educational videos');
 
 }); // <-- This closes the DOMContentLoaded listener
