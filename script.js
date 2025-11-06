@@ -1,20 +1,19 @@
-// This line waits for the HTML to be fully loaded before running any code
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- PASTE YOUR (FULL!) API KEY HERE ---
     const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
 
-    // Get the HTML elements we need to work with
+    // Get the HTML elements
     const pageContainer = document.getElementById('page-container');
     const searchButton = document.getElementById('search-button');
     const searchInput = document.getElementById('search-input');
     const resultsContainer = document.getElementById('results-container');
     const loadMoreButton = document.getElementById('load-more-button');
-
-    // --- Get the modal elements ---
     const modalContainer = document.getElementById('modal-container');
     const modalCloseButton = document.getElementById('modal-close-button');
     const videoPlayerContainer = document.getElementById('video-player-container');
+    // --- NEW: Get the analytics box ---
+    const analyticsContainer = document.getElementById('video-analytics-container');
 
     // --- Variables for search pagination ---
     let nextPageToken = '';
@@ -32,13 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         videos.forEach(video => {
-            let videoId, videoTitle, videoThumbnail, channelName; // <-- Added channelName
+            let videoId, videoTitle, videoThumbnail, channelName;
             
             if (video.kind === 'youtube#searchResult') {
                 videoId = video.id.videoId;
                 videoTitle = video.snippet.title;
                 videoThumbnail = video.snippet.thumbnails.high.url;
-                channelName = video.snippet.channelTitle; // <-- THIS IS THE NEW LINE
+                channelName = video.snippet.channelTitle;
             } else {
                 return; // Unknown, skip
             }
@@ -46,24 +45,125 @@ document.addEventListener('DOMContentLoaded', () => {
             const videoElement = document.createElement('div');
             videoElement.className = 'video-item';
 
-            // --- THIS HTML IS UPDATED ---
             videoElement.innerHTML = `
                 <img src="${videoThumbnail}" alt="${videoTitle}">
                 <h4>${videoTitle}</h4>
                 <p class="channel-name">${channelName}</p> 
             `;
-            // --- END OF UPDATE ---
             
+            // --- UPDATED CLICK LISTENER ---
             videoElement.addEventListener('click', () => {
-                openModal(videoId);
+                // NEW: We first get the stats, THEN open the modal.
+                getVideoDetailsAndOpenModal(videoId);
             });
+            // --- END OF UPDATE ---
 
             resultsContainer.appendChild(videoElement);
         });
     }
+
+    // --- NEW FUNCTION ---
+    // This makes a 2nd API call to get stats
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    // END OF FUNCTION
+    async function getVideoDetailsAndOpenModal(videoId) {
+        const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${API_KEY}`;
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.items && data.items.length > 0) {
+                const videoDetails = data.items[0];
+                // Now we have the stats, we can open the modal
+                openModal(videoId, videoDetails);
+            } else {
+                throw new Error('Video details not found.');
+            }
+        } catch (error) {
+            // If the call fails, just open the video player
+            // without the stats box.
+            openModal(videoId, null); 
+            console.error('Error loading video details:', error.message);
+        }
+    }
+
+    // --- UPDATED openModal FUNCTION ---
+    // It now accepts 'videoDetails'
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    function openModal(videoId, videoDetails) {
+        // 1. Add the video player (this is the same)
+        videoPlayerContainer.innerHTML = `
+            <iframe 
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        `;
+        
+        // 2. Check if we have details to show
+        if (videoDetails) {
+            const stats = videoDetails.statistics;
+            const snippet = videoDetails.snippet;
+
+            // Format numbers with commas (e.g., 1,234,567)
+            // Use '?? 0' to prevent errors if a stat is missing
+            const viewCount = parseInt(stats.viewCount ?? 0).toLocaleString();
+            const likeCount = parseInt(stats.likeCount ?? 0).toLocaleString();
+            const commentCount = parseInt(stats.commentCount ?? 0).toLocaleString();
+
+            // Format the date
+            const uploadDate = new Date(snippet.publishedAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // 3. Build the HTML for the stats
+            analyticsContainer.innerHTML = `
+                <p>${snippet.title}</p>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <strong>${viewCount}</strong>
+                        Views
+                    </div>
+                    <div class="stat-item">
+                        <strong>${likeCount}</strong>
+                        Likes
+                    </div>
+                    <div class="stat-item">
+                        <strong>${commentCount}</strong>
+                        Comments
+                    </div>
+                    <div class="stat-item">
+                        <strong>${uploadDate}</strong>
+                        Uploaded
+                    </div>
+                </div>
+            `;
+            // 4. Make the analytics box visible
+            analyticsContainer.classList.add('visible');
+        }
+        
+        // 5. Show the modal
+        modalContainer.style.display = 'flex'; 
+    }
+
+    // --- UPDATED closeModal FUNCTION ---
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    function closeModal() {
+        videoPlayerContainer.innerHTML = '';
+        // NEW: Clear the analytics box and hide it
+        analyticsContainer.innerHTML = '';
+        analyticsContainer.classList.remove('visible');
+        
+        modalContainer.style.display = 'none';
+    }
+
+    //
+    // --- (All other functions are the same) ---
+    //
 
     // Event listener for "Press Enter to Search"
     searchInput.addEventListener('keydown', (event) => {
@@ -76,15 +176,15 @@ document.addEventListener('DOMContentLoaded', () => {
     searchButton.addEventListener('click', () => {
         const query = searchInput.value;
         if (query) {
-            nextPageToken = ''; // Reset the token
-            currentSearchQuery = query; // Remember this query
-            loadMoreButton.style.display = 'none'; // Hide button
-            resultsContainer.innerHTML = ''; // Clear old results
+            nextPageToken = ''; 
+            currentSearchQuery = query;
+            loadMoreButton.style.display = 'none'; 
+            resultsContainer.innerHTML = ''; 
             
             pageContainer.classList.add('results-layout');
             pageContainer.classList.remove('centered-layout');
 
-            searchVideos(currentSearchQuery); // Call the search
+            searchVideos(currentSearchQuery);
         }
     });
 
@@ -105,27 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Function to open the modal ---
-    function openModal(videoId) {
-        videoPlayerContainer.innerHTML = `
-            <iframe 
-                src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
-                title="YouTube video player" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen>
-            </iframe>
-        `;
-        modalContainer.style.display = 'flex'; 
-    }
-
-    // --- Function to close the modal ---
-    function closeModal() {
-        videoPlayerContainer.innerHTML = '';
-        modalContainer.style.display = 'none';
-    }
-
-    // --- This function now handles pagination ---
+    // --- Search function ---
     async function searchVideos(query) {
         let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${API_KEY}&type=video&maxResults=50`;
         
@@ -138,8 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (data.items) {
-                nextPageToken = data.nextPageToken; // Save the *new* token
-                displayVideos(data.items); // Display videos
+                nextPageToken = data.nextPageToken; 
+                displayVideos(data.items); 
                 
                 if (nextPageToken) {
                     loadMoreButton.style.display = 'block';
