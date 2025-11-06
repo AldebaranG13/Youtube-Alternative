@@ -22,37 +22,27 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Make it full screen */
+    min-height: 100vh;
     flex-direction: column;
-    
-    /* --- NEW BACKGROUND IMAGE AND OVERLAY --- */
-    background-image: linear-gradient(rgba(27, 54, 93, 0.7), rgba(27, 54, 93, 0.7)), url('https://static.wixstatic.com/media/900868_1eef8fad3b5c45c588e649b5b2143b37~mv2_d_4632_2608_s_4_2.jpg/v1/fill/w_560,h_230,al_c,q_80,usm_0.33_1.00_0.00,enc_avif,quality_auto/900868_1eef8fad3b5c45c588e649b5b2143b37~mv2_d_4632_2608_s_4_2.jpg');
+    background-image: linear-gradient(rgba(27, 54, 93, 0.7), rgba(27, 54, 93, 0.7)), url('https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop');
     background-size: cover;
     background-position: center;
-    /* --- END OF NEW BACKGROUND --- */
 }
-
 .centered-layout header {
-    background-color: transparent; /* No background */
+    background-color: transparent; 
     padding: 20px;
-    border-bottom: none; /* No border */
+    border-bottom: none; 
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
 }
-
-.centered-layout main {
-    display: none; /* Hide results and 'load more' on homepage */
-}
+.centered-layout main { display: none; }
 
 /* 2. "AFTER SEARCH" STATE */
-.results-layout {
-    display: block; /* Normal page flow */
-}
-
+.results-layout { display: block; }
 .results-layout header {
-    background-color: var(--fiwa-dark-blue); /* Add background back */
+    background-color: var(--fiwa-dark-blue); 
     padding: 20px;
     border-bottom: 1px solid #ddd;
     display: flex;
@@ -60,40 +50,25 @@ body {
     align-items: center;
     gap: 15px; 
 }
+.results-layout main { display: block; }
 
-.results-layout main {
-    display: block; /* Show results */
-}
-/* --- END OF LAYOUT STYLES --- */
-
-header h1 {
-    margin: 0;
-    color: var(--fiwa-dark-blue); /* Default color (for a flash) */
-}
-
-/* --- NEW: Make homepage title white --- */
-.centered-layout header h1 {
-    color: white;
-}
-
-.results-layout header h1 {
-    color: white; /* White text on dark header */
-}
+/* --- HEADER & SEARCH STYLES --- */
+header h1 { margin: 0; }
+.centered-layout header h1 { color: white; }
+.results-layout header h1 { color: white; }
 
 .search-container {
     width: 100%;
-    max-width: 600px; /* Limit search bar width */
+    max-width: 600px;
     display: flex;
 }
-
 #search-input {
     width: 100%;
     padding: 10px 15px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 20px 0 0 20px; /* Rounded */
+    border-radius: 20px 0 0 20px;
 }
-
 #search-button {
     padding: 10px 15px;
     font-size: 16px;
@@ -101,62 +76,62 @@ header h1 {
     border-left: none;
     background-color: #f8f8f8;
     cursor: pointer;
-    border-radius: 0 20px 20px 0; /* Rounded */
+    border-radius: 0 20px 20px 0;
 }
-#search-button:hover {
-    background-color: #eee;
-}
+#search-button:hover { background-color: #eee; }
 
 .disclaimer {
     margin: 0;
     padding: 0 10%;
     font-size: 12px;
-    color: #888;
     font-style: italic;
     text-align: center;
 }
+.centered-layout .disclaimer { color: #ddd; }
+.results-layout .disclaimer { color: #ccc; }
 
-/* --- NEW: Make homepage disclaimer light --- */
-.centered-layout .disclaimer {
-    color: #ddd;
-}
-
-.results-layout .disclaimer {
-    color: #ccc; /* Lighter text on dark header */
-}
-
+/* --- RESULTS GRID STYLES --- */
 #results-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px;
 }
-
 .video-item {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     overflow: hidden;
     cursor: pointer;
+    
+    /* --- NEW ANIMATION: Fade-in for search results --- */
+    animation: fadeIn 0.5s ease-in-out;
+    
+    /* --- NEW ANIMATION: Transition for hover --- */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.video-item img { width: 100%; height: auto; }
 
+/* --- NEW ANIMATION: Hover effect --- */
+.video-item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.video-item img { width: 100%; height: auto; }
 .video-item h4 {
-    padding: 10px 10px 0; /* No bottom padding */
+    padding: 10px 10px 0;
     margin: 0;
     font-size: 16px;
     color: #333;
 }
-
 .channel-name {
-    padding: 4px 10px 10px; /* Add padding */
+    padding: 4px 10px 10px;
     margin: 0;
     font-size: 14px;
-    color: #555; /* Dark grey */
+    color: #555;
 }
-
 #load-more-button {
-    display: none; /* Hidden by default */
+    display: none;
     margin: 20px auto;
     padding: 12px 24px;
     font-size: 16px;
@@ -169,15 +144,26 @@ header h1 {
 }
 #load-more-button:hover { background-color: var(--fiwa-gold); }
 
-/* --- MODAL STYLES (No changes) --- */
+/* --- MODAL STYLES --- */
 #modal-container {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.85); z-index: 1000;
     display: none; justify-content: center; align-items: center;
+    overflow-y: auto; 
+    
+    /* --- NEW ANIMATION: Fade-in for the modal background --- */
+    animation: fadeIn 0.3s ease;
 }
 #modal-content {
-    background-color: #000; padding: 20px; border-radius: 8px;
-    position: relative; width: 80%; max-width: 900px;
+    background-color: #000; 
+    padding: 20px; 
+    border-radius: 8px;
+    position: relative; 
+    width: 80%; 
+    max-width: 900px;
+    padding-bottom: 0; 
+    margin-top: 50px;
+    margin-bottom: 50px;
 }
 #modal-close-button {
     position: absolute; top: -15px; right: -15px; background-color: white;
@@ -190,4 +176,47 @@ header h1 {
 }
 #video-player-container iframe {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+}
+
+/* --- ANALYTICS BOX STYLES --- */
+#video-analytics-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    color: #333;
+    display: none; 
+}
+#video-analytics-container.visible {
+    display: block;
+}
+#video-analytics-container p {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+#video-analytics-container .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+    gap: 10px;
+    font-size: 14px;
+}
+#video-analytics-container .stat-item strong {
+    display: block;
+    font-size: 16px;
+    color: var(--fiwa-dark-blue);
+}
+
+/* --- 
+NEW ANIMATION: Keyframes for the fade-in effect 
+--- 
+*/
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
