@@ -232,6 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---
     // NEW: LOAD DEFAULT VIDEOS ON STARTUP
     // ---
-    searchVideos('interesting science and technology videos');
+    searchVideos('islamic');
 
 }); // <-- This closes the DOMContentLoaded listener
